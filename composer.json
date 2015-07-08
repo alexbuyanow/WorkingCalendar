@@ -26,5 +26,8 @@
     },
     "config": {
         "preferred-install": "dist"
-    }
+    },
+    "classmap": [
+        "database/"
+    ]
 }
