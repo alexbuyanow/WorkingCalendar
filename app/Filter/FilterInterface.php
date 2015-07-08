@@ -2,6 +2,7 @@
 
 namespace App\Filter;
 
+use App\Model\FilteredModelInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -16,7 +17,7 @@ interface FilterInterface
      * @param Model $object
      * @return boolean
      */
-    public function isSatisfied(Model $object);
+    public function isSatisfied(FilteredModelInterface $object);
 
     /**
      * Getting callback for filtering

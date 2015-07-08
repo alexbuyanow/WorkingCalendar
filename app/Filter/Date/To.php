@@ -3,6 +3,7 @@
 namespace App\Filter\Date;
 
 use App\Filter;
+use App\Model\FilteredModelInterface;
 use DateTime;
 use Illuminate\Database\Eloquent\Model;
 
@@ -31,7 +32,7 @@ class To extends Filter\FilterAbstract implements Filter\FilterInterface
      * @param Model $date
      * @return boolean
      */
-    public function isSatisfied(Model $date)
+    public function isSatisfied(FilteredModelInterface $date)
     {
         return $date->getAttribute('date') <= $this->date;
     }
