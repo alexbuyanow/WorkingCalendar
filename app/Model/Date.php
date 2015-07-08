@@ -10,11 +10,15 @@ use Illuminate\Support\Collection;
  *
  * @package App\Model
  */
-class Date extends Model
+class Date extends Model implements FilteredModelInterface
 {
 
     protected $table = 'date';
     protected $primaryKey = 'date';
+
+    protected $fillable = ['date'];
+    protected $guarded = [];
+    protected $dates = ['date'];
 
 
     /**

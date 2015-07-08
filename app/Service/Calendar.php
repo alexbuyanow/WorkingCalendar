@@ -45,7 +45,7 @@ class Calendar implements CalendarInterface
      *
      * @var Collection
      */
-    private $exceptionDaysCollection;
+    private $exceptDaysCollection;
 
 
     /**
@@ -54,7 +54,7 @@ class Calendar implements CalendarInterface
     public function __construct(Collection $collection)
     {
         $this->oneDayInterval          = new DateInterval('P1D');
-        $this->exceptionDaysCollection = $collection;
+        $this->exceptDaysCollection = $collection;
     }
 
     /**
@@ -70,7 +70,7 @@ class Calendar implements CalendarInterface
         $iterationValue    = 0;
 
         $fromFilter = new Date\From($this->normalizeDateToBegin($date));
-        $exceptedDays = $this->exceptionDaysCollection
+        $exceptedDays = $this->exceptDaysCollection
             ->filter($fromFilter->filterCallback());
 
         while($iterationValue < $daysNumber)
@@ -95,7 +95,7 @@ class Calendar implements CalendarInterface
         $iterationValue    = 0;
 
         $toFilter = new Date\To($this->normalizeDateToEnd($date));
-        $exceptedDays = $this->exceptionDaysCollection
+        $exceptedDays = $this->exceptDaysCollection
             ->filter($toFilter->filterCallback());
 
         while($iterationValue < $daysNumber)
@@ -135,7 +135,7 @@ class Calendar implements CalendarInterface
             $this->normalizeDateToBegin($from),
             $this->normalizeDateToEnd($to)
         );
-        $exceptedDays = $this->exceptionDaysCollection
+        $exceptedDays = $this->exceptDaysCollection
             ->filter($rangeFilter->filterCallback());
 
         $workingDateObject = clone $from;
@@ -162,7 +162,7 @@ class Calendar implements CalendarInterface
     {
         return $this->isWorkingDayInCollection(
             $this->normalizeDateToBegin($date),
-            $this->exceptionDaysCollection
+            $this->exceptDaysCollection
         );
     }
 
@@ -194,7 +194,7 @@ class Calendar implements CalendarInterface
     {
 
         $fromFilter = new Date\From($this->normalizeDateToBegin($date));
-        $exceptedDays = $this->exceptionDaysCollection
+        $exceptedDays = $this->exceptDaysCollection
             ->filter($fromFilter->filterCallback());
 
         while(!$this->isWorkingDay($date))
@@ -254,7 +254,7 @@ class Calendar implements CalendarInterface
     private function isExceptedByCollection(DateTime $date, Collection $exceptedDays)
     {
         return !$exceptedDays
-            ->where('date', $this->getDateSqlFormat($date))
+            ->filter((new Date\Equal($date))->filterCallback())
             ->isEmpty();
     }
 
