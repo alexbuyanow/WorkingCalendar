@@ -33,6 +33,6 @@ class Equal extends Filter\FilterAbstract implements Filter\FilterInterface
      */
     public function isSatisfied(Model $date)
     {
-        return $this->date == $date->date;
+        return $this->date == $date->getAttribute('date');
     }
 }

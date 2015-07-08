@@ -33,6 +33,6 @@ class To extends Filter\FilterAbstract implements Filter\FilterInterface
      */
     public function isSatisfied(Model $date)
     {
-        return $date->date <= $this->date;
+        return $date->getAttribute('date') <= $this->date;
     }
 }

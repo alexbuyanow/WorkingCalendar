@@ -33,8 +33,6 @@ class From extends Filter\FilterAbstract implements Filter\FilterInterface
      */
     public function isSatisfied(Model $date)
     {
-//        var_dump($this->date, $date->date, $date->date >= $this->date);
-        return $date->date >= $this->date;
-//        return $date->getDate() >= $this->date;
+        return $date->getAttribute('date') >= $this->date;
     }
 }

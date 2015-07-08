@@ -35,6 +35,6 @@ class Range extends Filter\FilterAbstract implements Filter\FilterInterface
      */
     public function isSatisfied(Model $date)
     {
-        return $date->date >= $this->dateFrom && $date->date <= $this->dateTo;
+        return $date->getAttribute('date') >= $this->dateFrom && $date->getAttribute('date') <= $this->dateTo;
     }
 }
