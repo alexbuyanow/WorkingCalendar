@@ -2,6 +2,7 @@
 
 use Exception;
 use Laravel\Lumen\Exceptions\Handler as ExceptionHandler;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 class Handler extends ExceptionHandler {
 
@@ -36,7 +37,15 @@ class Handler extends ExceptionHandler {
      */
     public function render($request, Exception $e)
     {
-        return parent::render($request, $e);
+        $statusCode = $e instanceof HttpExceptionInterface ? $e->getStatusCode() : $e->getCode();
+        return response()->json(
+            [
+                'success'   => false,
+                'error'     => $e->getMessage(),
+            ],
+            $statusCode
+        );
+//        return parent::render($request, $e);
     }
 
 }

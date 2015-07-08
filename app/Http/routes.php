@@ -11,13 +11,9 @@
 |
 */
 
-$app->get('/', function() use ($app) {
-    return $app->welcome();
-});
-
 $app->group(
     [
-        'prefix'    => '/api_v1',
+        'prefix'    => '/api/v1',
         'as'        => 'api_v1',
     ],
     function(\Laravel\Lumen\Application $app)

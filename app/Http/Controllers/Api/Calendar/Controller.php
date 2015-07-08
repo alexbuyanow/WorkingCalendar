@@ -158,13 +158,13 @@ class Controller extends BaseController
     {
         $dateObject = DateTime::createFromFormat($this->dateFormat, $date);
 
-        if($dateObject)
+        if($dateObject && $date == $dateObject->format($this->dateFormat))
         {
             return $dateObject;
         }
 
         $exceptionString = sprintf('Invalid date %s', $date);
-        throw new Exception\InvalidArgumentException($exceptionString);
+        throw new Exception\InvalidArgumentException($exceptionString, 400);
     }
 
     /**
