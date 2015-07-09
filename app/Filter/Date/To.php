@@ -5,7 +5,6 @@ namespace App\Filter\Date;
 use App\Filter;
 use App\Model\FilteredModelInterface;
 use DateTime;
-use Illuminate\Database\Eloquent\Model;
 
 /**
  * Date to filter (including given date)
@@ -29,7 +28,7 @@ class To extends Filter\FilterAbstract implements Filter\FilterInterface
     /**
      * Is Model satisfied to filter
      *
-     * @param Model $date
+     * @param FilteredModelInterface $date
      * @return boolean
      */
     public function isSatisfied(FilteredModelInterface $date)

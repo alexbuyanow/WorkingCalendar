@@ -5,7 +5,6 @@ namespace App\Filter\Date;
 use App\Filter;
 use App\Model\FilteredModelInterface;
 use DateTime;
-use Illuminate\Database\Eloquent\Model;
 
 /**
  * Date in range filter (including begin date and end one)
@@ -31,7 +30,7 @@ class Range extends Filter\FilterAbstract implements Filter\FilterInterface
     /**
      * Is Model satisfied to filter
      *
-     * @param Model $date
+     * @param FilteredModelInterface $date
      * @return boolean
      */
     public function isSatisfied(FilteredModelInterface $date)

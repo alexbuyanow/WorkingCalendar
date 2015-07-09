@@ -3,7 +3,6 @@
 namespace App\Filter;
 
 use App\Model\FilteredModelInterface;
-use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class FilterAbstract
@@ -14,7 +13,7 @@ abstract class FilterAbstract implements FilterInterface
     /**
      * Is Model satisfied to filter
      *
-     * @param Model $object
+     * @param FilteredModelInterface $object
      * @return boolean
      */
     abstract public function isSatisfied(FilteredModelInterface $object);
