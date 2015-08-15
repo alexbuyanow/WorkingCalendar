@@ -37,7 +37,8 @@ class Handler extends ExceptionHandler {
      */
     public function render($request, Exception $e)
     {
-        $statusCode = $e instanceof HttpExceptionInterface ? $e->getStatusCode() : $e->getCode();
+        $statusCode = $e instanceof HttpExceptionInterface ? $e->getStatusCode() : 500; //S$e->getCode();
+        $statusCode = $statusCode ?: 500;
         return response()->json(
             [
                 'success'   => false,
