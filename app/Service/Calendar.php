@@ -75,7 +75,7 @@ class Calendar implements CalendarInterface
 
         while($iterationValue < $daysNumber)
         {
-            $workingDateObject->add($this->oneDayInterval);
+            $workingDateObject = $workingDateObject->add($this->oneDayInterval);
             $iterationValue += $this->incrementCounterIfDayWorking($workingDateObject, $exceptedDays);
         }
 
@@ -83,7 +83,7 @@ class Calendar implements CalendarInterface
     }
 
     /**
-     * Sub N working days frpm date
+     * Sub N working days from date
      *
      * @param DateTime $date
      * @param int      $daysNumber
@@ -100,7 +100,7 @@ class Calendar implements CalendarInterface
 
         while($iterationValue < $daysNumber)
         {
-            $workingDateObject->sub($this->oneDayInterval);
+            $workingDateObject = $workingDateObject->sub($this->oneDayInterval);
             $iterationValue += $this->incrementCounterIfDayWorking($workingDateObject, $exceptedDays);
         }
 
@@ -122,8 +122,6 @@ class Calendar implements CalendarInterface
             throw new Exception\InvalidArgumentException('First date is later then second one');
         }
 
-        $from       = clone $from;
-        $to         = clone $to;
         $daysNumber = $this->normalizeDateToNoon($from)->diff($this->normalizeDateToNoon($to))->days;
 
         if($daysNumber === 0)
@@ -193,9 +191,9 @@ class Calendar implements CalendarInterface
     public function getWorkingDay(DateTime $date)
     {
 
-        $fromFilter = new Date\From($this->normalizeDateToBegin($date));
-        $exceptedDays = $this->exceptDaysCollection
-            ->filter($fromFilter->filterCallback());
+//        $fromFilter = new Date\From($this->normalizeDateToBegin($date));
+//        $exceptedDays = $this->exceptDaysCollection
+//            ->filter($fromFilter->filterCallback());
 
         while(!$this->isWorkingDay($date))
         {
@@ -229,7 +227,7 @@ class Calendar implements CalendarInterface
     }
 
     /**
-     * Incremnt if day is working
+     * Increment if day is working
      *
      * @param DateTime   $date
      * @param Collection $exceptedDays
