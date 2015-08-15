@@ -14,58 +14,22 @@ use Illuminate\Support\Collection;
 class CalendarTest extends \PHPUnit_Framework_TestCase
 {
 
-    /**
-     * Test regular week working and weekend days
-     *
-     * @return void
-     */
-    public function testIsWorkingDayWithoutExcepted()
+    public function testIsWorkingDayWithoutExceptedDays()
     {
+        $collection     = $this->getEmptyCollectionMock(2);
+        $calendar       = new Calendar($collection);
 
-        $calendar = new Calendar(new Collection());
-
-        $dayMonday = new DateTime('2013-04-22');
-        $this->assertTrue($calendar->isWorkingDay($dayMonday));
-
-        $dayTuesday = new DateTime('2013-04-23');
-        $this->assertTrue($calendar->isWorkingDay($dayTuesday));
-
-        $dayWednesday = new DateTime('2013-04-24');
-        $this->assertTrue($calendar->isWorkingDay($dayWednesday));
-
-        $dayThursday = new DateTime('2013-04-25');
-        $this->assertTrue($calendar->isWorkingDay($dayThursday));
-
-        $dayFriday = new DateTime('2013-04-26');
-        $this->assertTrue($calendar->isWorkingDay($dayFriday));
-
-        $daySaturday = new DateTime('2013-04-27');
-        $this->assertFalse($calendar->isWorkingDay($daySaturday));
-
-        $daySunday = new DateTime('2013-04-28');
-        $this->assertFalse($calendar->isWorkingDay($daySunday));
+        $this->assertTrue($calendar->isWorkingDay($this->getDateTimeWorkingDateMock()));
+        $this->assertFalse($calendar->isWorkingDay($this->getDateTimeWeekEndDateMock()));
     }
 
-    /**
-     * Test holidays on week working days
-     *
-     * @return void
-     */
-    public function testIsWorkingDayWithExcepted()
+    public function testIsWorkingDayWithExceptedDays()
     {
-        $calendarEntities = new Collection(
-            [
-                $this->getDateModelMock('2013-04-22'),
-                $this->getDateModelMock('2013-04-27'),
-            ]
-        );
-        $calendar = new Calendar($calendarEntities);
+        $collection     = $this->getNotEmptyCollectionMock(2);
+        $calendar       = new Calendar($collection);
 
-        $this->assertFalse($calendar->isWorkingDay(new DateTime('2013-04-22')));
-        $this->assertFalse($calendar->isWorkingDay(new DateTime('2013-04-22 12:00:00')));
-        $this->assertTrue($calendar->isWorkingDay(new DateTime('2013-04-27')));
-        $this->assertTrue($calendar->isWorkingDay(new DateTime('2013-04-27 12:00:00')));
-
+        $this->assertFalse($calendar->isWorkingDay($this->getDateTimeWorkingDateMock()));
+        $this->assertTrue($calendar->isWorkingDay($this->getDateTimeWeekEndDateMock()));
     }
 
     /**
@@ -74,19 +38,26 @@ class CalendarTest extends \PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    public function testAddWorkDaysWithoutExcepted()
+    public function testAddWorkDaysWithoutExceptedDays()
     {
-        $calendar  = new Calendar(new Collection());
-        $startDate = new DateTime('2013-04-24');
+        $collection     = $this->getEmptyCollectionMock(1);
+        $calendar       = new Calendar($collection);
 
-        $startDateAndOneWorkDay = $calendar->add($startDate, 1);
-        $this->assertEquals(new DateTime('2013-04-25'), $startDateAndOneWorkDay);
+        $workDate       = $this->getDateTimeWorkingDateMock();
+        $workDate
+            ->expects($this->atLeast(1))
+            ->method('add')
+            ->willReturnSelf();
 
-        $startDateAndWorkDaysWithOneHoliday = $calendar->add($startDate, 3);
-        $this->assertEquals(new DateTime('2013-04-29'), $startDateAndWorkDaysWithOneHoliday);
+        $this->assertInstanceOf('\DateTime', $calendar->add($workDate, 1));
 
-        $startDateAndWorkDaysWithAnyHolidays = $calendar->add($startDate, 10);
-        $this->assertEquals(new DateTime('2013-05-08'), $startDateAndWorkDaysWithAnyHolidays);
+        $weekEndDate    = $this->getDateTimeWeekEndDateMock();
+        $weekEndDate
+            ->expects($this->atLeast(1))
+            ->method('add')
+            ->willReturn($workDate);
+
+        $this->assertInstanceOf('\DateTime', $calendar->add($weekEndDate, 1));
     }
 
 
@@ -96,39 +67,26 @@ class CalendarTest extends \PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    public function testAddWorkDaysWithExcepted()
+    public function testAddWorkDaysWithExceptedDays()
     {
-        $startDate = new DateTime('2013-04-24');
+        $collection     = $this->getNotEmptyCollectionMock(1);
+        $calendar       = new Calendar($collection);
 
-        $calendarEntities = new Collection(
-            [
-                $this->getDateModelMock('2013-04-25'),
-            ]
-        );
-        $calendar = new Calendar($calendarEntities);
+        $weekEndDate    = $this->getDateTimeWeekEndDateMock();
+        $workDate       = $this->getDateTimeWorkingDateMock();
+        $workDate
+            ->expects($this->atLeast(1))
+            ->method('add')
+            ->willReturn($weekEndDate);
 
-        $startDateAndOneWorkDay = $calendar->add($startDate, 1);
-        $this->assertEquals(new DateTime('2013-04-26'), $startDateAndOneWorkDay);
+        $this->assertInstanceOf('\DateTime', $calendar->add($workDate, 1));
 
-        $startDateAndWorkDaysWithOneHoliday = $calendar->add($startDate, 3);
-        $this->assertEquals(new DateTime('2013-04-30'), $startDateAndWorkDaysWithOneHoliday);
+        $weekEndDate
+            ->expects($this->atLeast(1))
+            ->method('add')
+            ->willReturnSelf();
 
-        $startDateAndWorkDaysWithAnyHolidays = $calendar->add($startDate, 10);
-        $this->assertEquals(new DateTime('2013-05-09'), $startDateAndWorkDaysWithAnyHolidays);
-
-
-        $calendarEntities = new Collection(
-            [
-                $this->getDateModelMock('2013-04-27'),
-            ]
-        );
-        $calendar = new Calendar($calendarEntities);
-
-        $startDateAndWorkDaysWithOneHoliday = $calendar->add($startDate, 3);
-        $this->assertEquals(new DateTime('2013-04-27'), $startDateAndWorkDaysWithOneHoliday);
-
-        $startDateAndWorkDaysWithAnyHolidays = $calendar->add($startDate, 10);
-        $this->assertEquals(new DateTime('2013-05-07'), $startDateAndWorkDaysWithAnyHolidays);
+        $this->assertInstanceOf('\DateTime', $calendar->add($weekEndDate, 1));
     }
 
     /**
@@ -137,19 +95,26 @@ class CalendarTest extends \PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    public function testSubWorkDaysWithoutExcepted()
+    public function testSubWorkDaysWithoutExceptedDays()
     {
-        $calendar  = new Calendar(new Collection());
-        $startDate = new DateTime('2013-04-24');
+        $collection     = $this->getEmptyCollectionMock(1);
+        $calendar       = new Calendar($collection);
 
-        $startDateAndOneWorkDay = $calendar->sub($startDate, 1);
-        $this->assertEquals(new DateTime('2013-04-23'), $startDateAndOneWorkDay);
+        $workDate       = $this->getDateTimeWorkingDateMock();
+        $workDate
+            ->expects($this->atLeast(1))
+            ->method('sub')
+            ->willReturnSelf();
 
-        $startDateAndWorkDaysWithOneHoliday = $calendar->sub($startDate, 3);
-        $this->assertEquals(new DateTime('2013-04-19'), $startDateAndWorkDaysWithOneHoliday);
+        $this->assertInstanceOf('\DateTime', $calendar->sub($workDate, 1));
 
-        $startDateAndWorkDaysWithAnyHolidays = $calendar->sub($startDate, 10);
-        $this->assertEquals(new DateTime('2013-04-10'), $startDateAndWorkDaysWithAnyHolidays);
+        $weekEndDate    = $this->getDateTimeWeekEndDateMock();
+        $weekEndDate
+            ->expects($this->atLeast(1))
+            ->method('sub')
+            ->willReturn($workDate);
+
+        $this->assertInstanceOf('\DateTime', $calendar->sub($weekEndDate, 1));
     }
 
     /**
@@ -158,39 +123,94 @@ class CalendarTest extends \PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    public function testSubWorkDaysWithExcepted()
+    public function testSubWorkDaysWithExceptedDays()
     {
-        $startDate = new DateTime('2013-04-24');
+        $collection     = $this->getNotEmptyCollectionMock(1);
+        $calendar       = new Calendar($collection);
 
-        $calendarEntities = new Collection(
-            [
-                $this->getDateModelMock('2013-04-23'),
-            ]
-        );
-        $calendar = new Calendar($calendarEntities);
+        $weekEndDate    = $this->getDateTimeWeekEndDateMock();
+        $workDate       = $this->getDateTimeWorkingDateMock();
+        $workDate
+            ->expects($this->atLeast(1))
+            ->method('sub')
+            ->willReturn($weekEndDate);
 
-        $startDateAndOneWorkDay = $calendar->sub($startDate, 1);
-        $this->assertEquals(new DateTime('2013-04-22'), $startDateAndOneWorkDay);
+        $this->assertInstanceOf('\DateTime', $calendar->sub($workDate, 1));
 
-        $startDateAndWorkDaysWithOneHoliday = $calendar->sub($startDate, 3);
-        $this->assertEquals(new DateTime('2013-04-18'), $startDateAndWorkDaysWithOneHoliday);
+        $weekEndDate
+            ->expects($this->atLeast(1))
+            ->method('sub')
+            ->willReturnSelf();
 
-        $startDateAndWorkDaysWithAnyHolidays = $calendar->sub($startDate, 10);
-        $this->assertEquals(new DateTime('2013-04-09'), $startDateAndWorkDaysWithAnyHolidays);
+        $this->assertInstanceOf('\DateTime', $calendar->sub($weekEndDate, 1));
+    }
 
+    /**
+     * Test working days count without excepted days
+     *  (holidays on working or working weekends)
+     *
+     * @return void
+     */
+    public function testCountWorkingDaysWithoutExceptedDays()
+    {
+        $collection     = $this->getEmptyCollectionMock(0);
+        $calendar       = new Calendar($collection);
 
-        $calendarEntities = new Collection(
-            [
-                $this->getDateModelMock('2013-04-20'),
-            ]
-        );
-        $calendar = new Calendar($calendarEntities);
+        $dateFrom       = $this->getAbstractDateTimeMock();
+        $dateTo         = $this->getAbstractDateTimeMock();
 
-        $startDateAndWorkDaysWithOneHoliday = $calendar->sub($startDate, 3);
-        $this->assertEquals(new DateTime('2013-04-20'), $startDateAndWorkDaysWithOneHoliday);
+        $dateFrom
+            ->expects($this->any())
+            ->method('diff')
+            ->willReturn($this->createDaysInterval(0));
 
-        $startDateAndWorkDaysWithAnyHolidays = $calendar->sub($startDate, 10);
-        $this->assertEquals(new DateTime('2013-04-11'), $startDateAndWorkDaysWithAnyHolidays);
+        $this->assertEquals(0, $calendar->countWorkingDays($dateFrom, $dateTo));
+
+        $dateFrom       = $this->getAbstractDateTimeMock();
+        $dateFrom
+            ->expects($this->atLeast(1))
+            ->method('add')
+            ->willReturn($this->getDateTimeWorkingDateMock());
+        $dateFrom
+            ->expects($this->any())
+            ->method('diff')
+            ->willReturn($this->createDaysInterval(1));
+
+        $this->assertEquals(1, $calendar->countWorkingDays($dateFrom, $dateTo));
+    }
+
+    /**
+     * Test working days count with excepted days
+     *  (holidays on working or working weekends)
+     *
+     * @return void
+     */
+    public function testCountWorkingDaysWithExceptedDays()
+    {
+        $collection     = $this->getEmptyCollectionMock(1);
+        $calendar       = new Calendar($collection);
+
+        $dateFrom       = $this->getAbstractDateTimeMock();
+        $dateTo         = $this->getAbstractDateTimeMock();
+
+        $dateFrom
+            ->expects($this->any())
+            ->method('diff')
+            ->willReturn($this->createDaysInterval(0));
+
+        $this->assertEquals(0, $calendar->countWorkingDays($dateFrom, $dateTo));
+
+        $dateFrom       = $this->getAbstractDateTimeMock();
+        $dateFrom
+            ->expects($this->atLeast(1))
+            ->method('add')
+            ->willReturn($this->getDateTimeWorkingDateMock());
+        $dateFrom
+            ->expects($this->any())
+            ->method('diff')
+            ->willReturn($this->createDaysInterval(1));
+
+        $this->assertEquals(1, $calendar->countWorkingDays($dateFrom, $dateTo));
     }
 
     /**
@@ -200,7 +220,8 @@ class CalendarTest extends \PHPUnit_Framework_TestCase
      */
     public function testCountWorkingDaysExceptionFirstDateLater()
     {
-        $calendar = new Calendar(new Collection());
+        $collection     = $this->getEmptyCollectionMock(0);
+        $calendar       = new Calendar($collection);
 
         $this->setExpectedException('InvalidArgumentException');
         $diffOneDay = $calendar->countWorkingDays(new DateTime('2013-04-25'), new DateTime('2013-04-24'));
@@ -208,151 +229,109 @@ class CalendarTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test working days count without excepted days
-     *  (holidays on working or working weekends)
-     *
-     * @return void
+     * @return \PHPUnit_Framework_MockObject_MockObject|DateTime
      */
-    public function testCountWorkingDaysWithoutExcepted()
+    private function getAbstractDateTimeMock()
     {
-        $calendar = new Calendar(new Collection());
-
-        $diffZeroDay = $calendar->countWorkingDays(
-            new DateTime('2013-04-24'),
-            new DateTime('2013-04-24')
+        $date = $this->getMock(
+            '\DateTime',
+            ['add', 'sub', 'modify', 'format', 'diff']
         );
-        $this->assertEquals(0, $diffZeroDay);
 
-        $diffZeroDayWithTime = $calendar->countWorkingDays(
-            new DateTime('2013-04-24 12:00:00'),
-            new DateTime('2013-04-24 15:10:00')
-        );
-        $this->assertEquals(0, $diffZeroDayWithTime);
+        $date
+            ->expects($this->any())
+            ->method('modify')
+            ->willReturnSelf();
 
-        $diffOneDay = $calendar->countWorkingDays(
-            new DateTime('2013-04-24'),
-            new DateTime('2013-04-25')
-        );
-        $this->assertEquals(1, $diffOneDay);
-
-        $diffOneDay = $calendar->countWorkingDays(
-            new DateTime('2013-04-26'),
-            new DateTime('2013-04-27')
-        );
-        $this->assertEquals(0, $diffOneDay);
-
-        $diffOneDayWithTime = $calendar->countWorkingDays(
-            new DateTime('2013-04-24 12:00:00'),
-            new DateTime('2013-04-25 15:10:00')
-        );
-        $this->assertEquals(1, $diffOneDayWithTime);
-
-        $diffTenDays = $calendar->countWorkingDays(
-            new DateTime('2013-04-24'),
-            new DateTime('2013-05-08')
-        );
-        $this->assertEquals(10, $diffTenDays);
-
-        $diffTenDaysWithTime = $calendar->countWorkingDays(
-            new DateTime('2013-04-24 12:00:00'),
-            new DateTime('2013-05-08 15:10:00')
-        );
-        $this->assertEquals(10, $diffTenDaysWithTime);
+        return $date;
     }
 
     /**
-     * Test working days count with excepted days
-     *  (holidays on working or working weekends)
-     *
-     * @return void
+     * @return \PHPUnit_Framework_MockObject_MockObject|DateTime
      */
-    public function testCountWorkingDaysWithExcepted()
+    private function getDateTimeWorkingDateMock()
     {
-        $calendarEntities = new Collection(
-            [
-                $this->getDateModelMock('2013-04-25'),
-            ]
-        );
-        $calendar = new Calendar($calendarEntities);
+        $date = $this->getAbstractDateTimeMock();
 
-        $diffZeroDay = $calendar->countWorkingDays(new DateTime('2013-04-24'), new DateTime('2013-04-24'));
-        $this->assertEquals(0, $diffZeroDay);
+        $date
+            ->expects($this->any())
+            ->method('format')
+            ->with('w')
+            ->willReturn(1);
 
-        $diffOneDay = $calendar->countWorkingDays(new DateTime('2013-04-24'), new DateTime('2013-04-25'));
-        $this->assertEquals(0, $diffOneDay);
-
-        $diffTenDays = $calendar->countWorkingDays(new DateTime('2013-04-24'), new DateTime('2013-05-08'));
-        $this->assertEquals(9, $diffTenDays);
-
-
-        $calendarEntities = new Collection(
-            [
-                $this->getDateModelMock('2013-04-27'),
-            ]
-        );
-        $calendar = new Calendar($calendarEntities);
-
-        $diffOneDay = $calendar->countWorkingDays(new DateTime('2013-04-26'), new DateTime('2013-04-27'));
-        $this->assertEquals(1, $diffOneDay);
-
-        $diffTenDays = $calendar->countWorkingDays(new DateTime('2013-04-24'), new DateTime('2013-05-08'));
-        $this->assertEquals(11, $diffTenDays);
+        return $date;
     }
 
     /**
-     * Test nearest working day getting without excepted days
-     *  (holidays on working or working weekends)
-     *
-     * @return void
+     * @return \PHPUnit_Framework_MockObject_MockObject|DateTime
      */
-    public function testGetWorkingDayWithoutExcepted()
+    private function getDateTimeWeekEndDateMock()
     {
-        $calendar = new Calendar(new Collection());
+        $date = $this->getAbstractDateTimeMock();
 
-        $this->assertEquals($calendar->getWorkingDay(new DateTime('2013-04-26')), new DateTime('2013-04-26'));
-        $this->assertEquals($calendar->getWorkingDay(new DateTime('2013-04-27')), new DateTime('2013-04-29'));
-        $this->assertEquals($calendar->getWorkingDay(new DateTime('2013-04-28')), new DateTime('2013-04-29'));
-    }
+        $date
+            ->expects($this->any())
+            ->method('format')
+            ->with('w')
+            ->willReturn(6);
 
-
-    /**
-     * Test nearest working day getting without excepted days
-     *  (holidays on working or working weekends)
-     *
-     * @return void
-     */
-    public function testGetWorkingDayWithExcepted()
-    {
-        $calendarEntities = new Collection(
-            [
-                $this->getDateModelMock('2013-04-26'),
-            ]
-        );
-        $calendar = new Calendar($calendarEntities);
-
-        $this->assertEquals($calendar->getWorkingDay(new DateTime('2013-04-26')), new DateTime('2013-04-29'));
-        $this->assertEquals($calendar->getWorkingDay(new DateTime('2013-04-27')), new DateTime('2013-04-29'));
-        $this->assertEquals($calendar->getWorkingDay(new DateTime('2013-04-28')), new DateTime('2013-04-29'));
-
-        $calendarEntities->push($this->getDateModelMock('2013-04-27'));
-
-        $this->assertEquals($calendar->getWorkingDay(new DateTime('2013-04-26')), new DateTime('2013-04-27'));
-        $this->assertEquals($calendar->getWorkingDay(new DateTime('2013-04-27')), new DateTime('2013-04-27'));
-        $this->assertEquals($calendar->getWorkingDay(new DateTime('2013-04-28')), new DateTime('2013-04-29'));
+        return $date;
     }
 
     /**
-     * Get Date model mock
-     *
-     * @param $date
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    private function getDateModelMock($date)
+    private function getAbstractCollectionMock()
     {
-        $mock = $this->getMock('App\Model\FilteredModelInterface', ['getAttribute']);
-        $mock->expects($this->any())
-            ->method('getAttribute')
-            ->will($this->returnValue(new DateTime($date)));
-        return $mock;
+        $collection = $this->getMock(
+            'Illuminate\Support\Collection',
+            ['filter', 'isEmpty']
+        );
+        $collection
+            ->expects($this->any())
+            ->method('filter')
+            ->withAnyParameters()
+            ->willReturnSelf();
+
+        return $collection;
+    }
+
+    /**
+     * @param integer $atLeastTimes
+     * @return \PHPUnit_Framework_MockObject_MockObject|Collection
+     */
+    private function getEmptyCollectionMock($atLeastTimes)
+    {
+        $collection = $this->getAbstractCollectionMock();
+        $collection
+            ->expects($this->atLeast($atLeastTimes))
+            ->method('isEmpty')
+            ->willReturn(true);
+
+        return $collection;
+    }
+
+    /**
+     * @param integer $atLeastTimes
+     * @return \PHPUnit_Framework_MockObject_MockObject|Collection
+     */
+    private function getNotEmptyCollectionMock($atLeastTimes)
+    {
+        $collection = $this->getAbstractCollectionMock();
+        $collection
+            ->expects($this->atLeast($atLeastTimes))
+            ->method('isEmpty')
+            ->willReturn(false);
+
+        return $collection;
+    }
+
+    /**
+     * @param integer $days
+     * @return \DateInterval
+     */
+    private function createDaysInterval($days)
+    {
+        return (new DateTime())->add(new \DateInterval(sprintf('P%sD', $days)))->diff(new DateTime());
     }
 }
