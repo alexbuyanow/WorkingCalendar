@@ -6,15 +6,14 @@ use App\Model\FilteredModelInterface;
 
 /**
  * Interface FilterInterface
- * @package App\Filter
  */
 interface FilterInterface
 {
     /**
      * Is Model satisfied to filter
      *
-     * @param FilteredModelInterface $object
-     * @return boolean
+     * @param  FilteredModelInterface $object
+     * @return bool
      */
     public function isSatisfied(FilteredModelInterface $object);
 

@@ -8,8 +8,6 @@ use Illuminate\Support\ServiceProvider;
 
 /**
  * Class CalendarServiceProvider
- *
- * @package App\Providers
  */
 class CalendarServiceProvider extends ServiceProvider
 {
@@ -22,12 +20,9 @@ class CalendarServiceProvider extends ServiceProvider
     {
         $this->app->bind(
             'App\Service\Calendar',
-            function($app)
-            {
+            function ($app) {
                 return new Calendar(Date::all());
             }
         );
-
     }
-
 }

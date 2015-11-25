@@ -10,12 +10,9 @@ use DateTime;
 
 /**
  * Working days Api controller
- *
- * @package App\Http\Controllers\Api\Calendar
  */
 class Controller extends BaseController
 {
-
     protected $dateFormat = Calendar::OPERATIONAL_DATE_FORMAT;
 
     /** @var  Date */
@@ -24,10 +21,9 @@ class Controller extends BaseController
     /** @var  CalendarInterface */
     protected $calendarService;
 
-
     /**
      * @param Calendar $calendarService
-     * @param Date $date
+     * @param Date     $date
      */
     public function __construct(Calendar $calendarService, Date $date)
     {
@@ -36,7 +32,7 @@ class Controller extends BaseController
     }
 
     /**
-     * @param string $date
+     * @param  string                                     $date
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function isWorkingDay($date)
@@ -50,8 +46,8 @@ class Controller extends BaseController
     }
 
     /**
-     * @param string $date
-     * @param integer $days
+     * @param  string                                     $date
+     * @param  int                                        $days
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function addWorkingDays($date, $days)
@@ -65,13 +61,14 @@ class Controller extends BaseController
     }
 
     /**
-     * @param string $date
-     * @param integer $days
+     * @param  string                                     $date
+     * @param  int                                        $days
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function addDays($date, $days)
     {
         $modifyString = sprintf('+%s days', $days);
+
         return response()->json(
             [
                 'success'        => true,
@@ -81,8 +78,8 @@ class Controller extends BaseController
     }
 
     /**
-     * @param string $date
-     * @param integer $days
+     * @param  string                                     $date
+     * @param  int                                        $days
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function subWorkingDays($date, $days)
@@ -96,13 +93,14 @@ class Controller extends BaseController
     }
 
     /**
-     * @param string $date
-     * @param integer $days
+     * @param  string                                     $date
+     * @param  int                                        $days
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function subDays($date, $days)
     {
         $modifyString = sprintf('-%s days', $days);
+
         return response()->json(
             [
                 'success'        => true,
@@ -112,15 +110,15 @@ class Controller extends BaseController
     }
 
     /**
-     * @param string $dateFrom
-     * @param string $dateTo
+     * @param  string                                     $dateFrom
+     * @param  string                                     $dateTo
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function countWorkingDays($dateFrom, $dateTo)
     {
         return response()->json(
             [
-                'success'        => true,
+                'success'         => true,
                 'result_count'    => $this->calendarService
                     ->countWorkingDays(
                         $this->getDateFromString($dateFrom),
@@ -131,26 +129,25 @@ class Controller extends BaseController
     }
 
     /**
-     * @param string $dateFrom
-     * @param string $dateTo
+     * @param  string                                     $dateFrom
+     * @param  string                                     $dateTo
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function countDays($dateFrom, $dateTo)
     {
         return response()->json(
             [
-                'success'        => true,
+                'success'         => true,
                 'result_count'    => $this->getDateFromString($dateFrom)
                     ->diff($this->getDateFromString($dateTo))->days,
             ]
         );
     }
 
-
     /**
      * Convert string date to DateTime
      *
-     * @param string $date
+     * @param  string                             $date
      * @return DateTime
      * @throws Exception\InvalidArgumentException invalid date string
      */
@@ -158,8 +155,7 @@ class Controller extends BaseController
     {
         $dateObject = DateTime::createFromFormat($this->dateFormat, $date);
 
-        if($dateObject && $date == $dateObject->format($this->dateFormat))
-        {
+        if ($dateObject && $date == $dateObject->format($this->dateFormat)) {
             return $dateObject;
         }
 
@@ -170,13 +166,12 @@ class Controller extends BaseController
     /**
      * Date modifier
      *
-     * @param string $date
-     * @param string $modifyString
+     * @param  string   $date
+     * @param  string   $modifyString
      * @return DateTime
      */
     private function getModifiedDate($date, $modifyString)
     {
         return $this->getDateFromString($date)->modify($modifyString);
     }
-
 }

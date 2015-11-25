@@ -6,9 +6,8 @@ use Illuminate\Database\Migrations\Migration;
 /**
  * Date table migration
  */
-class Date extends Migration
+class date extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -18,8 +17,7 @@ class Date extends Migration
     {
         Schema::create(
             'date',
-            function(Blueprint $table)
-            {
+            function (Blueprint $table) {
                 $table->date('date');
                 $table->primary('date');
             }
@@ -35,5 +33,4 @@ class Date extends Migration
     {
         Schema::dropIfExists('date');
     }
-
 }

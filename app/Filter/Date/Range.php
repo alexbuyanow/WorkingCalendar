@@ -8,14 +8,11 @@ use DateTime;
 
 /**
  * Date in range filter (including begin date and end one)
- * @package App\Filter\Date
  */
 class Range extends Filter\FilterAbstract implements Filter\FilterInterface
 {
-
     /** @var  DateTime */
     protected $dateFrom;
-
 
     /**
      * @param DateTime $dateFrom
@@ -30,8 +27,8 @@ class Range extends Filter\FilterAbstract implements Filter\FilterInterface
     /**
      * Is Model satisfied to filter
      *
-     * @param FilteredModelInterface $date
-     * @return boolean
+     * @param  FilteredModelInterface $date
+     * @return bool
      */
     public function isSatisfied(FilteredModelInterface $date)
     {
