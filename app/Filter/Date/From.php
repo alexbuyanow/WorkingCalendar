@@ -8,14 +8,11 @@ use DateTime;
 
 /**
  * Date from filter (including given date)
- * @package App\Filter\Date
  */
 class From extends Filter\FilterAbstract implements Filter\FilterInterface
 {
-
     /** @var  DateTime */
     protected $date;
-
 
     /**
      * @param DateTime $date
@@ -28,8 +25,8 @@ class From extends Filter\FilterAbstract implements Filter\FilterInterface
     /**
      * Is Model satisfied to filter
      *
-     * @param FilteredModelInterface $date
-     * @return boolean
+     * @param  FilteredModelInterface $date
+     * @return bool
      */
     public function isSatisfied(FilteredModelInterface $date)
     {

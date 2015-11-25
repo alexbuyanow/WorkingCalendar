@@ -6,15 +6,14 @@ use App\Model\FilteredModelInterface;
 
 /**
  * Class FilterAbstract
- * @package App\Filter
  */
 abstract class FilterAbstract implements FilterInterface
 {
     /**
      * Is Model satisfied to filter
      *
-     * @param FilteredModelInterface $object
-     * @return boolean
+     * @param  FilteredModelInterface $object
+     * @return bool
      */
     abstract public function isSatisfied(FilteredModelInterface $object);
 
@@ -25,12 +24,8 @@ abstract class FilterAbstract implements FilterInterface
      */
     public function filterCallback()
     {
-        return function(FilteredModelInterface $model)
-        {
+        return function (FilteredModelInterface $model) {
             return $this->isSatisfied($model);
         };
     }
-
-
-
 }

@@ -16,8 +16,7 @@ $app->group(
         'prefix'    => '/api/v1',
         'as'        => 'api_v1',
     ],
-    function(\Laravel\Lumen\Application $app)
-    {
+    function (\Laravel\Lumen\Application $app) {
         $app->get(
             'is_working/{date}',
             [
